@@ -1,10 +1,16 @@
 package main
 
-import "os"
+import (
+	"os"
+
+	"git.aventer.biz/AVENTER/util"
+)
 
 func init() {
-	API_PROXYBIND = os.Getenv("API_PROXYBIND")
-	API_PROXYPORT = os.Getenv("API_PROXYPORT")
-	TARGET_URL = os.Getenv("TARGET_URL")
-	SKIP_SSL = os.Getenv("SKIP_SSL")
+	APIProxyBind = os.Getenv("API_PROXYBIND")
+	APIProxyPort = os.Getenv("API_PROXYPORT")
+	TargetURL = os.Getenv("TARGET_URL")
+	SkipSSL = os.Getenv("SKIP_SSL")
+	BlockAgent = os.Getenv("BLOCK_USERAGENT")
+	LogLevel = util.Getenv("LOGLEVEL", "info")
 }

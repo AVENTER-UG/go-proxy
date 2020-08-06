@@ -7,7 +7,7 @@ COPY . /build/
 RUN apk add git && \
     go get -d
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags "-X main.MinVersion=`date -u +%Y%m%d%.H%M%S` -extldflags \"-static\"" -o main app.go init.go
+RUN go mod vendor; CGO_ENABLED=0 GOOS=linux go build -mod=vendor -a -installsuffix cgo -ldflags "-X main.MinVersion=`date -u +%Y%m%d%.H%M%S` -extldflags \"-static\"" -o main app.go init.go
 
 
 FROM alpine
@@ -17,6 +17,7 @@ ENV API_PROXYPORT=10777
 ENV API_PROXYBIND=0.0.0.0
 ENV TARGET_URL=http://test
 ENV SKIP_SSL=false
+ENV LOG_LEVEL=info
 
 RUN apk add --no-cache ca-certificates
 RUN adduser -S -D -H -h /app appuser
