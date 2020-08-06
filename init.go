@@ -7,10 +7,10 @@ import (
 )
 
 func init() {
-	APIProxyBind = os.Getenv("API_PROXYBIND")
-	APIProxyPort = os.Getenv("API_PROXYPORT")
+	APIProxyBind = util.Getenv("API_PROXYBIND", "0.0.0.0")
+	APIProxyPort = util.Getenv("API_PROXYPORT", "10777")
 	TargetURL = os.Getenv("TARGET_URL")
-	SkipSSL = os.Getenv("SKIP_SSL")
+	SkipSSL = util.Getenv("SKIP_SSL", "false")
 	BlockAgent = os.Getenv("BLOCK_USERAGENT")
 	LogLevel = util.Getenv("LOGLEVEL", "info")
 }
