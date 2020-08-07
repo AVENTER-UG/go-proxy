@@ -12,5 +12,6 @@ func init() {
 	TargetURL = os.Getenv("TARGET_URL")
 	SkipSSL = util.Getenv("SKIP_SSL", "false")
 	BlockAgent = os.Getenv("BLOCK_USERAGENT")
+	BlockURL = os.Getenv("BLOCK_URL")
 	LogLevel = util.Getenv("LOGLEVEL", "info")
 }

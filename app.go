@@ -27,6 +27,9 @@ var SkipSSL string
 // BlockAgent include a regularexpression to denied access of specified user agents
 var BlockAgent string
 
+// BlockURL include a regularexpression to denied access of specified url
+var BlockURL string
+
 // LogLevel defines the loglevel
 var LogLevel string
 
@@ -34,7 +37,8 @@ var LogLevel string
 var MinVersion string
 
 var srv http.Server
-var re *regexp.Regexp
+var reAgent *regexp.Regexp
+var reURL *regexp.Regexp
 
 type handle struct {
 	reverseProxy string
@@ -44,9 +48,17 @@ func (this *handle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	logrus.Info(this.reverseProxy + " " + r.Method + " " + r.URL.String() + " " + r.Proto + " " + r.UserAgent())
 
 	if BlockAgent != "" {
-		fi := re.Find([]byte(r.UserAgent()))
+		fi := reAgent.Find([]byte(r.UserAgent()))
 		if len(fi) > 0 {
 			logrus.Debug("Blocked: ", r.UserAgent())
+			return
+		}
+	}
+
+	if BlockURL != "" {
+		fi := reURL.Find([]byte(r.URL.String()))
+		if len(fi) > 0 {
+			logrus.Debug("Blocked: ", r.URL.String())
 			return
 		}
 	}
@@ -70,14 +82,30 @@ func (this *handle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	proxy.ServeHTTP(w, r)
 }
 
-func main() {
+func main() {	if BlockAgent != "" {
+	fi := reAgent.Find([]byte(r.UserAgent()))
+	if len(fi) > 0 {
+		logrus.Debug("Blocked: ", r.UserAgent())
+		return
+	}
+}
 	util.SetLogging(LogLevel, false, "go-proxy")
 	logrus.Infoln("GO-PROXY build"+MinVersion, APIProxyBind, APIProxyPort, TargetURL, SkipSSL)
 
 	if BlockAgent != "" {
 		logrus.Infoln("Block following Agents: ", BlockAgent)
 		var err error
-		re, err = regexp.Compile(BlockAgent)
+		reAgent, err = regexp.Compile(BlockAgent)
+
+		if err != nil {
+			logrus.Error(err)
+		}
+	}
+
+	if BlockURL != "" {
+		logrus.Infoln("Block following Url: ", BlockURL)
+		var err error
+		reURL, err = regexp.Compile(BlockURL)
 
 		if err != nil {
 			logrus.Error(err)
