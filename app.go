@@ -45,8 +45,6 @@ type handle struct {
 }
 
 func (this *handle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	logrus.Info(this.reverseProxy + " " + r.Method + " " + r.URL.String() + " " + r.Proto + " " + r.UserAgent())
-
 	if BlockAgent != "" {
 		fi := reAgent.Find([]byte(r.UserAgent()))
 		if len(fi) > 0 {
@@ -80,15 +78,11 @@ func (this *handle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	r.Header.Set("X-Forwarded-Host", r.Header.Get("Host"))
 
 	proxy.ServeHTTP(w, r)
+
+	logrus.Info(this.reverseProxy + " " + r.Method + " " + r.URL.String() + " " + r.Proto + " " + r.UserAgent())
 }
 
-func main() {	if BlockAgent != "" {
-	fi := reAgent.Find([]byte(r.UserAgent()))
-	if len(fi) > 0 {
-		logrus.Debug("Blocked: ", r.UserAgent())
-		return
-	}
-}
+func main() {
 	util.SetLogging(LogLevel, false, "go-proxy")
 	logrus.Infoln("GO-PROXY build"+MinVersion, APIProxyBind, APIProxyPort, TargetURL, SkipSSL)
 
