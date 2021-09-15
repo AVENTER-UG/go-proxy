@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"regexp"
 
-	"git.aventer.biz/AVENTER/util"
+	"github.com/AVENTER-UG/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -82,6 +82,16 @@ func (this *handle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	logrus.Info(this.reverseProxy + " " + r.Method + " " + r.URL.String() + " " + r.Proto + " " + r.UserAgent())
 }
 
+func listenLoop() {
+	srv.Handler = &handle{reverseProxy: TargetURL}
+	srv.Addr = APIProxyBind + ":" + APIProxyPort
+	if err := srv.ListenAndServe(); err != nil {
+		logrus.Fatal("ListenAndServe: ", err)
+		srv.Close()
+		listenLoop()
+	}
+}
+
 func main() {
 	util.SetLogging(LogLevel, false, "go-proxy")
 	logrus.Infoln("GO-PROXY build"+MinVersion, APIProxyBind, APIProxyPort, TargetURL, SkipSSL)
@@ -106,9 +116,5 @@ func main() {
 		}
 	}
 
-	srv.Handler = &handle{reverseProxy: TargetURL}
-	srv.Addr = APIProxyBind + ":" + APIProxyPort
-	if err := srv.ListenAndServe(); err != nil {
-		logrus.Fatal("ListenAndServe: ", err)
-	}
+	listenLoop()
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"git.aventer.biz/AVENTER/util"
+	"github.com/AVENTER-UG/util"
 )
 
 func init() {
