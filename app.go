@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"net/http"
 	"net/http/httputil"
-	_ "net/http/pprof"
 	"net/url"
 	"regexp"
 
@@ -70,6 +69,7 @@ func (this *handle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if SkipSSL == "true" {
 		proxy.Transport = &http.Transport{
+			// #nosec G402
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 	}

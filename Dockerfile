@@ -7,7 +7,7 @@ COPY . /build/
 RUN apk add git && \
     go get -d
 
-RUN go mod vendor; CGO_ENABLED=0 GOOS=linux go build -mod=vendor -a -installsuffix cgo -ldflags "-X main.MinVersion=`date -u +%Y%m%d%.H%M%S` -extldflags \"-static\"" -o main app.go init.go
+RUN go mod vendor; CGO_ENABLED=0 GOOS=linux go build -mod=vendor -a -installsuffix cgo -ldflags "-X main.MinVersion=`date -u +%Y%m%d%.H%M%S` -extldflags \"-static\"" -o main .
 
 
 FROM alpine
