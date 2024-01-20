@@ -2,7 +2,7 @@
 
 #vars
 IMAGENAME=go-proxy
-TAG=
+TAG=latest
 BUILDDATE=${shell date -u +%Y-%m-%dT%H:%M:%SZ}
 IMAGEFULLNAME=avhost/${IMAGENAME}
 BRANCH=${shell git symbolic-ref --short HEAD}
@@ -26,24 +26,18 @@ help:
 
 build:
 	@echo ">>>> Build docker image"
-	@docker buildx build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${BRANCH} .
+	@docker build --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
 
-push:
-	@echo ">>>> Push into private repo"
-	@docker push localhost:5000/mesos-m3s:dev
 
 build-bin:
 	@echo ">>>> Build binary"
 	@CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags "-X main.BuildVersion=${BUILDDATE} -X main.GitVersion=${TAG} -X main.VersionURL=${VERSION_URL} -extldflags \"-static\"" .
 
-publish-latest:
-	@echo ">>>> Publish docker image"
-	docker tag ${IMAGEFULLNAME}:${BRANCH} ${IMAGEFULLNAME}:latest
-	docker push ${IMAGEFULLNAME}:latest
+push:
+	@echo ">>>> Build docker image"
+	@docker buildx build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:latest .
+	@docker buildx build --push --build-arg TAG=${TAG} --build-arg BUILDDATE=${BUILDDATE} -t ${IMAGEFULLNAME}:${TAG} .
 
-publish-tag:
-	@echo ">>>> Publish docker image"
-	@docker push ${IMAGEFULLNAME}:${BRANCH}
 
 update-gomod:
 	go get -u
@@ -55,4 +49,4 @@ sboom:
 	syft dir:. > sbom.txt
 	syft dir:. -o json > sbom.json
 
-all: build seccheck sboom publish-latest
+all: build seccheck sboom push
